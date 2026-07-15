@@ -1,65 +1,189 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { GigCard } from '@/components/cards/GigCard';
+import { CategoryCard } from '@/components/cards/CategoryCard';
+import { FreelancerCard } from '@/components/cards/FreelancerCard';
+import { LoadingSpinner, SkeletonLoader } from '@/components/common/LoadingSpinner';
+import { useFetch } from '@/app/hooks/useFetch';
+import { CATEGORIES } from '@/app/lib/constants';
+import { Gig, Freelancer } from '@/app/types';
+import { ArrowRight, Check } from 'lucide-react';
+
+export default function HomePage() {
+  const { data: gigsData, isLoading: gigsLoading } = useFetch<any>('/gigs?limit=8');
+  const { data: trendingData, isLoading: trendingLoading } = useFetch<any>('/gigs/trending');
+
+  const gigs = gigsData?.data || [];
+  const trending = trendingData || [];
+
+  // Demo freelancers
+  const freelancers: Freelancer[] = [
+    {
+      _id: '1',
+      name: 'Sarah Johnson',
+      title: 'Expert Web Developer',
+      rating: 5,
+      completedGigs: 127,
+      hourlyRate: 85,
+      description: 'Full-stack web development with React, Next.js, and Node.js',
+    },
+    {
+      _id: '2',
+      name: 'Alex Chen',
+      title: 'UI/UX Designer',
+      rating: 4.9,
+      completedGigs: 89,
+      hourlyRate: 75,
+      description: 'Beautiful, user-centered design for web and mobile apps',
+    },
+    {
+      _id: '3',
+      name: 'Maria Garcia',
+      title: 'Content Writer',
+      rating: 4.8,
+      completedGigs: 156,
+      hourlyRate: 55,
+      description: 'Professional blog posts, articles, and marketing copy',
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            Find the Perfect <span className="text-rose-600">Freelancer</span> for Your Project
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg text-muted-foreground mb-8">
+            Connect with talented professionals and bring your ideas to life. Browse thousands of gigs or post your own.
           </p>
+          <div className="flex gap-4 justify-center">
+            <Link href="/explore">
+              <Button size="lg" className="bg-rose-600 hover:bg-rose-700">
+                Browse Gigs
+              </Button>
+            </Link>
+            <Link href="/gigs/add">
+              <Button size="lg" variant="outline">
+                Post a Gig
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 md:gap-8 text-center py-8">
+          <div>
+            <p className="text-3xl md:text-4xl font-bold text-rose-600">10K+</p>
+            <p className="text-muted-foreground">Freelancers</p>
+          </div>
+          <div>
+            <p className="text-3xl md:text-4xl font-bold text-amber-500">25K+</p>
+            <p className="text-muted-foreground">Active Gigs</p>
+          </div>
+          <div>
+            <p className="text-3xl md:text-4xl font-bold text-green-500">500M+</p>
+            <p className="text-muted-foreground">Earned</p>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Trending Gigs */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-foreground">Trending Gigs</h2>
+          <Link href="/explore" className="text-rose-600 hover:text-rose-700 flex items-center gap-2">
+            View All <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        {trendingLoading ? (
+          <SkeletonLoader />
+        ) : trending.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trending.slice(0, 4).map((gig: Gig) => (
+              <GigCard key={gig._id} gig={gig} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No trending gigs available yet</p>
+          </div>
+        )}
+      </section>
+
+      {/* Categories */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-foreground mb-8">Browse by Category</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {CATEGORIES.slice(0, 12).map((category) => (
+            <CategoryCard key={category} name={category} />
+          ))}
+        </div>
+      </section>
+
+      {/* Top Freelancers */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-foreground mb-8">Top Freelancers</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {freelancers.map((freelancer) => (
+            <FreelancerCard key={freelancer._id} freelancer={freelancer} />
+          ))}
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="max-w-7xl mx-auto px-4 py-16 bg-card rounded-xl p-8 md:p-12">
+        <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Why Choose GigForge?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: 'Verified Freelancers',
+              description: 'All freelancers are vetted and verified to ensure quality work.',
+            },
+            {
+              title: 'Secure Payments',
+              description: 'Your payment is protected until the work is completed.',
+            },
+            {
+              title: '24/7 Support',
+              description: 'Our support team is always available to help you.',
+            },
+          ].map((feature, index) => (
+            <div key={index} className="flex gap-4">
+              <div className="flex-shrink-0">
+                <Check className="w-6 h-6 text-green-500 mt-1" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold text-foreground mb-4">Ready to Get Started?</h2>
+        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+          Join thousands of businesses and freelancers who are already using GigForge to accomplish their goals.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link href="/explore">
+            <Button size="lg" className="bg-rose-600 hover:bg-rose-700">
+              Explore Gigs
+            </Button>
+          </Link>
+          <Link href="/contact">
+            <Button size="lg" variant="outline">
+              Get in Touch
+            </Button>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
